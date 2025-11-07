@@ -1,0 +1,30 @@
+.wrapper {
+	overflow: auto;
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.table th,
+.table td {
+	text-align: left;
+	padding: 8px 10px;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.details {
+	padding: 6px 10px;
+	border-radius: 6px;
+	border: 1px solid #0f766e;
+	background: #0f766e;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.detailsRow td {
+	background: #f8fafc;
+}
+
+

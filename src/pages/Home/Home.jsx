@@ -21,6 +21,7 @@ const Home = () => {
       car: form.get("car"),
       service: form.get("service"),
       datetime: form.get("datetime"),
+      durationMinutes: Number(form.get("durationMinutes")) || 60,
       price: Number(form.get("price")) || 0,
       workers: form.getAll("workers"),
       boxId: form.get("boxId") || null,
@@ -42,11 +43,12 @@ const Home = () => {
           <input name="car" required placeholder="Автомобиль" />
           <input name="service" required placeholder="Услуга" />
           <input name="datetime" required type="datetime-local" />
+          <input name="durationMinutes" type="number" min="5" step="5" placeholder="Длительность, мин" />
           <input name="price" type="number" min="0" step="100" placeholder="Цена, ₽" />
           <select name="boxId" defaultValue="">
             <option value="">Без бокса</option>
             {boxes.map((b) => (
-              <option key={b.id} value={b.id}>Бокс #{b.number}</option>
+              <option key={b.id} value={b.id}>{b.number}</option>
             ))}
           </select>
           <label className={styles.label}>Выберите работников</label>

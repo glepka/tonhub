@@ -1,0 +1,36 @@
+.panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.item {
+  border: 1px dashed #94a3b8;
+  border-radius: 6px;
+  padding: 8px;
+  background: #f8fafc;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.name {
+  font-weight: 600;
+}
+.amount {
+  color: #0f172a;
+}

@@ -14,10 +14,12 @@
   border-top: var(--border);
   box-shadow: 0 -12px 28px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(18px);
+  overflow-x: hidden;
 }
 
 .link {
   flex: 1;
+  min-width: 0;
 }
 
 .item {
@@ -31,14 +33,23 @@
   background: var(--bgElevated);
   box-shadow: var(--softShadow);
   min-height: 52px;
+  width: 100%;
 }
 
 .dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+
+.dotActive {
   background: linear-gradient(135deg, var(--green), var(--greenDark));
   box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+}
+
+.dotInactive {
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
 }
 
 .text {
@@ -46,6 +57,14 @@
   font-weight: 600;
   font-size: 13px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: var(--text);
 }
 
 @media (min-width: 768px) {
@@ -80,5 +99,3 @@
     font-size: 14px;
   }
 }
-
-

@@ -1,0 +1,61 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.input,
+.select {
+  padding: 8px 10px;
+  border: var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.summary {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.summaryItem {
+  color: var(--muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  border-bottom: var(--border);
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 12px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  text-align: center;
+  color: #777;
+}

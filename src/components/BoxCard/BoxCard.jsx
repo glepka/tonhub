@@ -7,7 +7,7 @@ const BoxCard = ({ box, onEdit, onDelete }) => {
     <div className={styles.card}>
       <div className={styles.row}>
         <div>
-          <div className={styles.name}>Бокс #{box.number}</div>
+          <div className={styles.name}>{box.number}</div>
           <div className={styles.desc}>{box.description || "—"}</div>
         </div>
         <div className={styles.actions}>

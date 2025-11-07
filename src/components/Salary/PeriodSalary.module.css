@@ -1,0 +1,37 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.input {
+  padding: 8px 10px;
+  border: var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: var(--border);
+  font-size: 12px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}

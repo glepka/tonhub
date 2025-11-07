@@ -30,6 +30,14 @@ const Modal = ({ open, onClose, title, children }) => {
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              type="button"
+              className={styles.closeButton}
+              aria-label="Закрыть"
+              onClick={onClose}
+            >
+              ×
+            </button>
             {title ? <div className={styles.title}>{title}</div> : null}
             <div className={styles.body}>{children}</div>
           </motion.div>

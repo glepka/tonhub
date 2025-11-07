@@ -9,16 +9,18 @@ export const useBookingsStore = create((set, get) => ({
       car: "BMW 5",
       service: "Полировка",
       datetime: new Date().toISOString(),
+      durationMinutes: 60,
       price: 8000,
       workers: ["Антон"],
       boxId: "b1",
+      salaryPercent: null,
     },
   ],
-  addBooking: ({ client, car, service, datetime, price, workers, boxId }) => {
+  addBooking: ({ client, car, service, datetime, durationMinutes, price, workers, boxId, salaryPercent }) => {
     const id = crypto.randomUUID();
     const next = [
       ...get().bookings,
-      { id, client, car, service, datetime, price, workers, boxId },
+      { id, client, car, service, datetime, durationMinutes: Number(durationMinutes) || 60, price, workers, boxId, salaryPercent: Number(salaryPercent) || null },
     ];
     set({ bookings: next });
     persistToCloud("bookings", next);

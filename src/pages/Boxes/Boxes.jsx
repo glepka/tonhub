@@ -45,7 +45,7 @@ const Boxes = () => {
 
       <Modal open={open} onClose={() => { setOpen(false); setEditing(null); }} title={editing ? "Редактировать бокс" : "Новый бокс"}>
         <form className={styles.form} onSubmit={onSubmit}>
-          <input name="number" required placeholder="Номер" defaultValue={editing?.number || ""} />
+          <input name="number" required placeholder="Название" defaultValue={editing?.number || ""} />
           <input name="description" placeholder="Описание" defaultValue={editing?.description || ""} />
           <Button type="submit">Сохранить</Button>
         </form>

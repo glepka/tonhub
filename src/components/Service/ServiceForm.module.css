@@ -1,0 +1,52 @@
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.row {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.label {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 220px;
+}
+
+.input,
+.select {
+	padding: 8px 10px;
+	border: 1px solid #d0d5dd;
+	border-radius: 6px;
+	font-size: 14px;
+}
+
+.error {
+	color: #b42318;
+	font-size: 14px;
+}
+
+.actions {
+	margin-top: 8px;
+}
+
+.submit {
+	padding: 8px 12px;
+	border: 1px solid #1d4ed8;
+	background: #1d4ed8;
+	color: white;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.submit:disabled {
+	background: #94a3b8;
+	border-color: #94a3b8;
+	cursor: not-allowed;
+}
+
+

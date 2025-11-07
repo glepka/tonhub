@@ -1,20 +1,37 @@
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
 }
 
 .header {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
-.left, .right {
+.left,
+.right {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  flex: 1;
+}
+
+.controls :global(button) {
+  flex: 1;
 }
 
 .left {
@@ -28,7 +45,27 @@
 .left :global(button),
 .right :global(button) {
   flex: 1;
-  min-width: 96px;
+  min-width: 84px;
+}
+
+.header :global(button) {
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.datePicker {
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  background: var(--bgElevated);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  margin-left: auto;
+}
+
+.navGrow {
+  flex: 1 1 0;
 }
 
 .grid {
@@ -115,10 +152,11 @@
   .header {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
-  .left, .right {
+  .left,
+  .right {
     flex-wrap: nowrap;
   }
 
@@ -138,4 +176,105 @@
   color: var(--text);
 }
 
+/* New calendar mode: days selector + timeline */
+.days {
+  display: grid;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
 
+.day {
+  background: var(--bgElevated);
+  border-radius: var(--cardRadius);
+  border: var(--border);
+  box-shadow: var(--softShadow);
+  padding: 8px 10px;
+  color: var(--text);
+  font-weight: 600;
+  text-align: left;
+}
+
+.daySelected {
+  outline: none;
+  box-shadow: var(--softShadow), inset 0 0 0 2px rgba(0, 255, 136, 0.5);
+}
+
+.timeline {
+  position: relative;
+  border-radius: var(--cardRadius);
+  background: var(--bgElevated);
+  border: var(--border);
+  box-shadow: var(--softShadow);
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.timelineInner {
+  position: relative;
+}
+
+.timeAxis {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 64px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.02), transparent);
+}
+
+.timeTick {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.timeLabel {
+  position: absolute;
+  left: 8px;
+  transform: translateY(-50%);
+  top: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.lanes {
+  display: grid;
+  gap: 12px;
+  margin-left: 64px;
+  height: 100%;
+  padding: 10px 10px 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.lane {
+  display: flex;
+  flex-direction: column;
+  background: var(--bgElevated);
+  border-left: var(--border);
+}
+
+.laneHeader {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom: var(--border);
+}
+
+.laneBody {
+  position: relative;
+  height: calc(100% - var(--headerHeight, 0px));
+}
+
+.event {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  border-radius: 12px;
+  padding: 10px;
+}

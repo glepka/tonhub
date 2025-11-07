@@ -7,6 +7,7 @@ import { initTelegram } from "./utils/telegram.js";
 import { useWorkersStore } from "./store/useWorkersStore.js";
 import { useBoxesStore } from "./store/useBoxesStore.js";
 import { useBookingsStore } from "./store/useBookingsStore.js";
+import { useSettingsStore } from "./store/useSettingsStore.js";
 
 const App = () => {
   useEffect(() => {
@@ -15,6 +16,7 @@ const App = () => {
     useWorkersStore.getState().hydrate?.();
     useBoxesStore.getState().hydrate?.();
     useBookingsStore.getState().hydrate?.();
+    useSettingsStore.getState().hydrate?.();
   }, []);
 
   return (
