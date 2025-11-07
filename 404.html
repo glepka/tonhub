@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting…</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      (function() {
+        var l = window.location;
+        var repo = "/tonhub"; // base path for project pages
+        var path = l.pathname.replace(new RegExp("^" + repo), "");
+        var target = repo + "/?/" + path.replace(/^\//, "");
+        if (l.search) target += "&" + l.search.slice(1);
+        if (l.hash) target += l.hash;
+        l.replace(target);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
+
+
