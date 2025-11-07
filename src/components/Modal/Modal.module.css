@@ -1,0 +1,30 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
+}
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bgElevated);
+  border: var(--border);
+  border-radius: 18px;
+  box-shadow: var(--cardShadow);
+}
+
+.title {
+  padding: 16px 18px 0 18px;
+  font-weight: 700;
+}
+
+.body {
+  padding: 16px 18px 18px 18px;
+}
+
+

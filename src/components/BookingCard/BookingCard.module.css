@@ -1,0 +1,55 @@
+.card {
+  background: var(--bgElevated);
+  border: var(--border);
+  border-radius: var(--cardRadius);
+  box-shadow: var(--softShadow);
+  padding: 12px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.price {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.sub {
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.workers {
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.actions :global(button) {
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .actions {
+    flex-wrap: nowrap;
+  }
+
+  .actions :global(button) {
+    flex: unset;
+  }
+}
+
+

@@ -1,0 +1,141 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.left, .right {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.left {
+  justify-content: flex-start;
+}
+
+.right {
+  justify-content: flex-end;
+}
+
+.left :global(button),
+.right :global(button) {
+  flex: 1;
+  min-width: 96px;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x mandatory;
+}
+
+.col {
+  background: var(--bgElevated);
+  border-radius: var(--cardRadius);
+  border: var(--border);
+  box-shadow: var(--softShadow);
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+
+.colHeader {
+  padding: 10px 12px;
+  border-bottom: var(--border);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.colBody {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.card {
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.rowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.client {
+  font-weight: 700;
+}
+
+.time {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.rowSub {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+@media (min-width: 768px) {
+  .wrap {
+    gap: 20px;
+  }
+
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .left, .right {
+    flex-wrap: nowrap;
+  }
+
+  .left :global(button),
+  .right :global(button) {
+    flex: unset;
+    min-width: unset;
+  }
+
+  .grid {
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+}
+
+.service {
+  color: var(--text);
+}
+
+

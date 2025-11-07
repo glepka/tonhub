@@ -1,0 +1,43 @@
+.card {
+  background: var(--bgElevated);
+  border: var(--border);
+  border-radius: var(--cardRadius);
+  box-shadow: var(--softShadow);
+  padding: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.role {
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions :global(button) {
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .actions {
+    flex-wrap: nowrap;
+  }
+
+  .actions :global(button) {
+    flex: unset;
+  }
+}
+
