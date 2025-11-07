@@ -37,6 +37,20 @@
   color: var(--text);
 }
 
+.datePickerWrapper {
+  width: 100%;
+}
+
+.datePicker {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: var(--border);
+  color: var(--text);
+  cursor: pointer;
+}
+
 .label {
   color: var(--muted);
   font-size: 12px;
@@ -68,14 +82,28 @@
   }
 }
 
-.workerOpt {
-  display: flex;
+
+.workerButton {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: var(--bgElevated);
-  border: var(--border);
+  justify-content: center;
+  padding: 8px 12px;
   border-radius: 12px;
-  padding: 6px 10px;
+  border: var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.workerButton:hover {
+  box-shadow: var(--softShadow);
+}
+
+.workerSelected {
+  background: linear-gradient(135deg, rgba(0,255,136,0.12), rgba(0,204,102,0.1));
+  border-color: rgba(0, 204, 102, 0.35);
 }
 
 

@@ -8,9 +8,7 @@ const rootEl = document.getElementById("root");
 const root = createRoot(rootEl);
 
 root.render(
-  <BrowserRouter>
+  <BrowserRouter basename="/tonhub">
     <App />
   </BrowserRouter>
 );
-
-

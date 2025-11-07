@@ -7,6 +7,7 @@
   justify-content: center;
   padding: 20px;
   z-index: 200;
+  height: var(--app-height);
 }
 
 .modal {
@@ -17,6 +18,9 @@
   border-radius: 18px;
   box-shadow: var(--cardShadow);
   position: relative;
+  max-height: calc(var(--app-height) - 40px);
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -26,6 +30,9 @@
 
 .body {
   padding: 16px 18px 18px 18px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
 }
 
 .closeButton {

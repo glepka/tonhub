@@ -1,7 +1,16 @@
-import React, { useMemo, useState, useRef, useLayoutEffect, useEffect } from "react";
+import React, {
+  useMemo,
+  useState,
+  useRef,
+  useLayoutEffect,
+  useEffect,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import styles from "./Calendar.module.css";
 import Button from "../Button/Button.jsx";
+import BookingPopup from "../BookingPopup/BookingPopup.jsx";
 import { useBookingsStore } from "../../store/useBookingsStore.js";
 import { useBoxesStore } from "../../store/useBoxesStore.js";
 import { formatDateKey, getWeekRange, getDayLabel } from "../../utils/date.js";
@@ -16,6 +25,7 @@ const Calendar = () => {
   const daysRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [headerOffset, setHeaderOffset] = useState(0);
+  const [activeBooking, setActiveBooking] = useState(null);
 
   const scrollSelectedDayIntoCenter = () => {
     const container = daysRef.current;
@@ -24,27 +34,21 @@ const Calendar = () => {
     if (!selectedEl) return;
     const containerRect = container.getBoundingClientRect();
     const selectedRect = selectedEl.getBoundingClientRect();
-    const elementCenter = (selectedRect.left - containerRect.left) + container.scrollLeft + (selectedRect.width / 2);
-    const target = elementCenter - (container.clientWidth / 2);
+    const elementCenter =
+      selectedRect.left -
+      containerRect.left +
+      container.scrollLeft +
+      selectedRect.width / 2;
+    const target = elementCenter - container.clientWidth / 2;
     const maxScroll = container.scrollWidth - container.clientWidth;
     const next = Math.max(0, Math.min(maxScroll, target));
     container.scrollTo({ left: next, behavior: "smooth" });
   };
 
-  const dateValue = useMemo(() => {
-    const y = selected.getFullYear();
-    const m = String(selected.getMonth() + 1).padStart(2, "0");
-    const d = String(selected.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  }, [selected]);
-
-  const onPickDate = (e) => {
-    const value = e.target.value;
-    if (!value) return;
-    const [y, m, d] = value.split("-");
-    const picked = new Date(Number(y), Number(m) - 1, Number(d));
-    setCursor(picked);
-    setSelected(picked);
+  const onPickDate = (date) => {
+    if (!date) return;
+    setCursor(date);
+    setSelected(date);
     // Ensure the newly rendered days row is in the DOM before scrolling
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -87,8 +91,12 @@ const Calendar = () => {
     const rAF = requestAnimationFrame(() => {
       const containerRect = container.getBoundingClientRect();
       const selectedRect = selectedEl.getBoundingClientRect();
-      const elementCenter = (selectedRect.left - containerRect.left) + container.scrollLeft + (selectedRect.width / 2);
-      const target = elementCenter - (container.clientWidth / 2);
+      const elementCenter =
+        selectedRect.left -
+        containerRect.left +
+        container.scrollLeft +
+        selectedRect.width / 2;
+      const target = elementCenter - container.clientWidth / 2;
       const maxScroll = container.scrollWidth - container.clientWidth;
       const next = Math.max(0, Math.min(maxScroll, target));
       container.scrollTo({ left: next, behavior: "smooth" });
@@ -107,6 +115,11 @@ const Calendar = () => {
               const d = new Date(selected.getTime() - 24 * 3600 * 1000);
               setCursor(d);
               setSelected(d);
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  scrollSelectedDayIntoCenter();
+                });
+              });
             }}
           >
             ←
@@ -118,6 +131,11 @@ const Calendar = () => {
               const d = new Date(selected.getTime() + 24 * 3600 * 1000);
               setCursor(d);
               setSelected(d);
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  scrollSelectedDayIntoCenter();
+                });
+              });
             }}
           >
             →
@@ -128,16 +146,22 @@ const Calendar = () => {
               const now = new Date();
               setCursor(now);
               setSelected(now);
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  scrollSelectedDayIntoCenter();
+                });
+              });
             }}
           >
             Сегодня
           </Button>
         </div>
-        <input
-          type="date"
-          value={dateValue}
+        <DatePicker
+          selected={selected}
           onChange={onPickDate}
+          dateFormat="dd.MM.yyyy"
           className={styles.datePicker}
+          wrapperClassName={styles.datePickerWrapper}
         />
       </div>
 
@@ -150,7 +174,9 @@ const Calendar = () => {
           transition={{ duration: 0.18 }}
           className={styles.days}
           ref={daysRef}
-          style={{ gridTemplateColumns: `repeat(${days.length}, minmax(140px, 1fr))` }}
+          style={{
+            gridTemplateColumns: `repeat(${days.length}, minmax(140px, 1fr))`,
+          }}
         >
           {days.map((d) => {
             const key = formatDateKey(d);
@@ -158,7 +184,9 @@ const Calendar = () => {
             return (
               <button
                 key={key}
-                className={`${styles.day} ${isSelected ? styles.daySelected : ""}`}
+                className={`${styles.day} ${
+                  isSelected ? styles.daySelected : ""
+                }`}
                 onClick={() => setSelected(d)}
               >
                 {getDayLabel(d)}
@@ -172,63 +200,97 @@ const Calendar = () => {
         <div
           ref={timelineInnerRef}
           className={styles.timelineInner}
-          style={{ height: `${(totalMinutes / 60) * HOUR_PX}px`, "--headerHeight": `${headerHeight}px`, "--headerOffset": `${headerOffset}px` }}
+          style={{
+            "--headerHeight": `${headerHeight}px`,
+            "--headerOffset": `${headerOffset}px`,
+          }}
         >
-        <div className={styles.timeAxis} style={{ top: headerOffset }}>
-          {new Array(HOURS_END - HOURS_START + 1).fill(0).map((_, i) => {
-            const h = HOURS_START + i;
-            return (
-              <div key={h} className={styles.timeTick} style={{ top: `${i * HOUR_PX}px` }}>
-                <span className={styles.timeLabel}>{`${String(h).padStart(2, "0")}:00`}</span>
-              </div>
-            );
-          })}
-        </div>
-        <div className={styles.lanes} style={{ gridTemplateColumns: `repeat(${boxes.length}, 220px)` }}>
-          {boxes.map((box, idx) => (
-            <div key={box.id} className={styles.lane}>
-              <div className={styles.laneHeader} ref={idx === 0 ? headerRef : null}>{box.number}</div>
-              <div className={styles.laneBody}>
-                {dayBookings
-                  .filter((b) => b.boxId === box.id)
-                  .map((b) => {
-                    const start = new Date(b.datetime);
-                    const minutes = start.getHours() * 60 + start.getMinutes();
-                    const rangeStart = HOURS_START * 60;
-                    const rangeEnd = HOURS_END * 60;
-                    const dur = Number(b.durationMinutes) || 60;
-                    const eventStart = Math.max(minutes, rangeStart);
-                    const eventEnd = Math.min(minutes + dur, rangeEnd);
-                    if (eventEnd <= rangeStart || eventStart >= rangeEnd) return null;
-                    const top = ((eventStart - rangeStart) / 60) * HOUR_PX;
-                    const height = Math.max(18, ((eventEnd - eventStart) / 60) * HOUR_PX);
-                    return (
-                      <div
-                        key={b.id}
-                        className={styles.event}
-                        style={{ top: `${top}px`, height: `${height}px` }}
-                      >
-                        <div className={styles.rowTop}>
-                          <span className={styles.client}>{b.client}</span>
-                          <span className={styles.time}>{start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+          <div className={styles.timeAxis} style={{ top: headerOffset }}>
+            {new Array(HOURS_END - HOURS_START + 1).fill(0).map((_, i) => {
+              const h = HOURS_START + i;
+              return (
+                <div
+                  key={h}
+                  className={styles.timeTick}
+                  style={{ top: `${i * HOUR_PX}px` }}
+                >
+                  <span className={styles.timeLabel}>{`${String(h).padStart(
+                    2,
+                    "0"
+                  )}:00`}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div
+            className={styles.lanes}
+            style={{ gridTemplateColumns: `repeat(${boxes.length}, 220px)` }}
+          >
+            {boxes.map((box, idx) => (
+              <div key={box.id} className={styles.lane}>
+                <div
+                  className={styles.laneHeader}
+                  ref={idx === 0 ? headerRef : null}
+                >
+                  {box.number}
+                </div>
+                <div className={styles.laneBody}>
+                  {dayBookings
+                    .filter((b) => b.boxId === box.id)
+                    .map((b) => {
+                      const start = new Date(b.datetime);
+                      const minutes =
+                        start.getHours() * 60 + start.getMinutes();
+                      const rangeStart = HOURS_START * 60;
+                      const rangeEnd = HOURS_END * 60;
+                      const dur = Number(b.durationMinutes) || 60;
+                      const eventStart = Math.max(minutes, rangeStart);
+                      const eventEnd = Math.min(minutes + dur, rangeEnd);
+                      if (eventEnd <= rangeStart || eventStart >= rangeEnd)
+                        return null;
+                      const top = ((eventStart - rangeStart) / 60) * HOUR_PX;
+                      const height = Math.max(
+                        18,
+                        ((eventEnd - eventStart) / 60) * HOUR_PX
+                      );
+                      return (
+                        <div
+                          key={b.id}
+                          className={styles.event}
+                          style={{ top: `${top}px`, height: `${height}px` }}
+                          onClick={() => setActiveBooking(b)}
+                        >
+                          <div className={styles.rowTop}>
+                            <span className={styles.client}>{b.client}</span>
+                            <span className={styles.time}>
+                              {start.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
+                          <div className={styles.rowSub}>
+                            <span className={styles.auto}>{b.car}</span>
+                            <span className={styles.service}>{b.service}</span>
+                          </div>
                         </div>
-                        <div className={styles.rowSub}>
-                          <span className={styles.auto}>{b.car}</span>
-                          <span className={styles.service}>{b.service}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </div>
       </div>
+
+      {activeBooking && (
+        <BookingPopup
+          booking={activeBooking}
+          onClose={() => setActiveBooking(null)}
+        />
+      )}
     </div>
   );
 };
 
 export default Calendar;
-
-

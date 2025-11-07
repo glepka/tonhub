@@ -54,6 +54,10 @@
   font-size: 13px;
 }
 
+.datePickerWrapper {
+  margin-left: auto;
+}
+
 .datePicker {
   padding: 8px 10px;
   border-radius: 12px;
@@ -61,7 +65,8 @@
   background: var(--bgElevated);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--text);
-  margin-left: auto;
+  width: 100%;
+  cursor: pointer;
 }
 
 .navGrow {
@@ -207,12 +212,13 @@
   border: var(--border);
   box-shadow: var(--softShadow);
   overflow-x: hidden;
-  overflow-y: auto;
-  flex: 1;
-  min-height: 0;
+  overflow-y: visible;
+  flex: unset;
+  min-height: unset;
 }
 .timelineInner {
   position: relative;
+  height: 800px;
 }
 
 .timeAxis {
@@ -277,4 +283,5 @@
   border: 1px solid rgba(0, 255, 136, 0.25);
   border-radius: 12px;
   padding: 10px;
+  cursor: pointer;
 }

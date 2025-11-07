@@ -1,0 +1,93 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.modal {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bgElevated);
+  border: var(--border);
+  border-radius: var(--cardRadius);
+  box-shadow: var(--softShadow);
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rowMulti {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: start;
+  gap: 12px;
+}
+
+.label {
+  color: var(--muted);
+}
+
+.value {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.workers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.workerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.workerButton:hover {
+  box-shadow: var(--softShadow);
+}
+
+.workerSelected {
+  background: linear-gradient(135deg, rgba(0,255,136,0.12), rgba(0,204,102,0.1));
+  border-color: rgba(0, 204, 102, 0.35);
+}
+
+
