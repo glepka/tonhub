@@ -10,7 +10,7 @@ const Boxes = () => {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const payload = {
@@ -18,9 +18,9 @@ const Boxes = () => {
       description: form.get("description"),
     };
     if (editing) {
-      updateBox(editing.id, payload);
+      await updateBox(editing.id, payload);
     } else {
-      addBox(payload);
+      await addBox(payload);
     }
     setOpen(false);
     setEditing(null);

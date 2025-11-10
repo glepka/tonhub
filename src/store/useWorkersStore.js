@@ -1,30 +1,68 @@
 import { create } from "zustand";
-import { persistToCloud, hydrateFromCloud } from "../utils/storage.js";
+import { api } from "../utils/api.js";
 
 export const useWorkersStore = create((set, get) => ({
-  workers: [
-    { id: "w1", name: "Антон", role: "Полировщик" },
-    { id: "w2", name: "Мария", role: "Мойщик" },
-  ],
-  addWorker: ({ name, role }) => {
-    const id = crypto.randomUUID();
-    const next = [...get().workers, { id, name, role }];
-    set({ workers: next });
-    persistToCloud("workers", next);
-  },
-  updateWorker: (id, patch) => {
-    const next = get().workers.map((w) => (w.id === id ? { ...w, ...patch } : w));
-    set({ workers: next });
-    persistToCloud("workers", next);
-  },
-  removeWorker: (id) => {
-    const next = get().workers.filter((w) => w.id !== id);
-    set({ workers: next });
-    persistToCloud("workers", next);
-  },
+  workers: [],
+  loading: false,
+  error: null,
+
   hydrate: async () => {
-    const data = await hydrateFromCloud("workers");
-    if (data) set({ workers: data });
+    set({ loading: true, error: null });
+    try {
+      const data = await api.getWorkers();
+      set({ workers: data || [], loading: false });
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      console.error("Failed to load workers:", err);
+    }
+  },
+
+  addWorker: async ({ name, role }) => {
+    set({ loading: true, error: null });
+    try {
+      const worker = await api.createWorker({ name, role });
+      set((state) => ({
+        workers: [...state.workers, worker],
+        loading: false,
+      }));
+      return { ok: true, worker };
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      console.error("Failed to create worker:", err);
+      return { ok: false, error: err.message };
+    }
+  },
+
+  updateWorker: async (id, patch) => {
+    set({ loading: true, error: null });
+    try {
+      const worker = await api.updateWorker(id, patch);
+      set((state) => ({
+        workers: state.workers.map((w) => (w.id === id ? worker : w)),
+        loading: false,
+      }));
+      return { ok: true };
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      console.error("Failed to update worker:", err);
+      return { ok: false, error: err.message };
+    }
+  },
+
+  removeWorker: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await api.deleteWorker(id);
+      set((state) => ({
+        workers: state.workers.filter((w) => w.id !== id),
+        loading: false,
+      }));
+      return { ok: true };
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      console.error("Failed to delete worker:", err);
+      return { ok: false, error: err.message };
+    }
   },
 }));
 

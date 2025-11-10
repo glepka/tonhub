@@ -1,21 +1,22 @@
 import { create } from "zustand";
-import { persistToCloud, hydrateFromCloud } from "../utils/storage.js";
+import { api } from "../utils/api.js";
 
 export const useBookingsStore = create((set, get) => ({
-  bookings: [
-    {
-      id: "bk1",
-      client: "Иван",
-      car: "BMW 5",
-      service: "Полировка",
-      datetime: new Date().toISOString(),
-      durationMinutes: 60,
-      price: 8000,
-      workers: ["Антон"],
-      boxId: "b1",
-      salaryPercent: null,
-    },
-  ],
+  bookings: [],
+  loading: false,
+  error: null,
+
+  hydrate: async (date) => {
+    set({ loading: true, error: null });
+    try {
+      const data = await api.getBookings(date);
+      set({ bookings: data || [], loading: false });
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      console.error("Failed to load bookings:", err);
+    }
+  },
+
   checkConflict: ({ datetime, durationMinutes, boxId, excludeId = null }) => {
     if (!boxId) return null;
     const start = new Date(datetime).getTime();
@@ -31,46 +32,77 @@ export const useBookingsStore = create((set, get) => ({
       return start < bEnd && bStart < end;
     }) || null;
   },
-  addBooking: ({ client, car, service, datetime, durationMinutes, price, workers, boxId, salaryPercent }) => {
-    const conflict = get().checkConflict({ datetime, durationMinutes, boxId });
-    if (conflict) {
-      return { ok: false, conflict };
+
+  addBooking: async ({ client, car, service, datetime, durationMinutes, price, workers, boxId, salaryPercent }) => {
+    set({ loading: true, error: null });
+    try {
+      const booking = await api.createBooking({
+        client,
+        car,
+        service,
+        datetime,
+        durationMinutes,
+        price,
+        workers,
+        boxId,
+        salaryPercent,
+      });
+      set((state) => ({
+        bookings: [...state.bookings, booking],
+        loading: false,
+      }));
+      return { ok: true, booking };
+    } catch (err) {
+      const errorMsg = err.message || "Ошибка при создании бронирования";
+      set({ error: errorMsg, loading: false });
+      console.error("Failed to create booking:", err);
+
+      // Check if it's a conflict error (409 status)
+      if (err.status === 409 && err.data?.conflict) {
+        return { ok: false, conflict: err.data.conflict, error: "Обнаружен конфликт времени" };
+      }
+
+      return { ok: false, error: errorMsg };
     }
-    const id = crypto.randomUUID();
-    const next = [
-      ...get().bookings,
-      { id, client, car, service, datetime, durationMinutes: Number(durationMinutes) || 60, price, workers, boxId, salaryPercent: Number(salaryPercent) || null },
-    ];
-    set({ bookings: next });
-    persistToCloud("bookings", next);
-    return { ok: true, id };
   },
-  updateBooking: (id, patch) => {
-    const current = get().bookings.find((b) => b.id === id);
-    if (!current) return { ok: false };
-    const nextDraft = { ...current, ...patch };
-    const conflict = get().checkConflict({
-      datetime: nextDraft.datetime,
-      durationMinutes: nextDraft.durationMinutes,
-      boxId: nextDraft.boxId,
-      excludeId: id,
-    });
-    if (conflict) {
-      return { ok: false, conflict };
+
+  updateBooking: async (id, patch) => {
+    set({ loading: true, error: null });
+    try {
+      const booking = await api.updateBooking(id, patch);
+      set((state) => ({
+        bookings: state.bookings.map((b) => (b.id === id ? booking : b)),
+        loading: false,
+      }));
+      return { ok: true };
+    } catch (err) {
+      const errorMsg = err.message || "Ошибка при обновлении бронирования";
+      set({ error: errorMsg, loading: false });
+      console.error("Failed to update booking:", err);
+
+      // Check if it's a conflict error (409 status)
+      if (err.status === 409 && err.data?.conflict) {
+        return { ok: false, conflict: err.data.conflict, error: "Обнаружен конфликт времени" };
+      }
+
+      return { ok: false, error: errorMsg };
     }
-    const next = get().bookings.map((b) => (b.id === id ? nextDraft : b));
-    set({ bookings: next });
-    persistToCloud("bookings", next);
-    return { ok: true };
   },
-  removeBooking: (id) => {
-    const next = get().bookings.filter((b) => b.id !== id);
-    set({ bookings: next });
-    persistToCloud("bookings", next);
-  },
-  hydrate: async () => {
-    const data = await hydrateFromCloud("bookings");
-    if (data) set({ bookings: data });
+
+  removeBooking: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await api.deleteBooking(id);
+      set((state) => ({
+        bookings: state.bookings.filter((b) => b.id !== id),
+        loading: false,
+      }));
+      return { ok: true };
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      console.error("Failed to delete booking:", err);
+      return { ok: false, error: err.message };
+    }
   },
 }));
 

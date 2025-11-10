@@ -10,7 +10,7 @@ const Workers = () => {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const payload = {
@@ -18,9 +18,9 @@ const Workers = () => {
       role: form.get("role"),
     };
     if (editing) {
-      updateWorker(editing.id, payload);
+      await updateWorker(editing.id, payload);
     } else {
-      addWorker(payload);
+      await addWorker(payload);
     }
     setOpen(false);
     setEditing(null);

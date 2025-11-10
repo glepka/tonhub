@@ -26,6 +26,8 @@ const Calendar = () => {
   const [headerHeight, setHeaderHeight] = useState(0);
   const [headerOffset, setHeaderOffset] = useState(0);
   const [activeBooking, setActiveBooking] = useState(null);
+  const shouldScrollRef = useRef(false);
+  const prevSelectedRef = useRef(selected);
 
   const scrollSelectedDayIntoCenter = () => {
     const container = daysRef.current;
@@ -47,17 +49,12 @@ const Calendar = () => {
 
   const onPickDate = (date) => {
     if (!date) return;
+    shouldScrollRef.current = true;
     setCursor(date);
     setSelected(date);
-    // Ensure the newly rendered days row is in the DOM before scrolling
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        scrollSelectedDayIntoCenter();
-      });
-    });
   };
 
-  const days = useMemo(() => getWeekRange(cursor), [cursor]);
+  const days = useMemo(() => getWeekRange(selected), [selected]);
 
   const selectedKey = useMemo(() => formatDateKey(selected), [selected]);
   const dayBookings = useMemo(() => {
@@ -79,15 +76,37 @@ const Calendar = () => {
       const headerBottom = headerRef.current.getBoundingClientRect().bottom;
       setHeaderOffset(Math.max(0, Math.round(headerBottom - innerTop)));
     }
-  }, [boxes.length, selected, cursor]);
+  }, [boxes.length, selected]);
 
   // Auto-scroll days row to keep selected day centered
+  // This handles cases when selected day is in the same week or when clicking on a day directly
   useEffect(() => {
+    const selectedChanged = formatDateKey(prevSelectedRef.current) !== formatDateKey(selected);
+    prevSelectedRef.current = selected;
+    
+    // If selected changed and scroll is requested, wait for animation to complete (180ms + buffer)
+    if (selectedChanged && shouldScrollRef.current) {
+      shouldScrollRef.current = false;
+      const timeoutId = setTimeout(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            scrollSelectedDayIntoCenter();
+          });
+        });
+      }, 200); // 180ms animation + 20ms buffer
+      return () => clearTimeout(timeoutId);
+    }
+    
+    // If scroll was requested but selected didn't change, scroll immediately
+    if (shouldScrollRef.current) {
+      shouldScrollRef.current = false;
+    }
+    
     const container = daysRef.current;
     if (!container) return;
     const selectedEl = container.querySelector(`.${styles.daySelected}`);
     if (!selectedEl) return;
-    // Ensure layout is ready after AnimatePresence mounts
+    // Ensure layout is ready
     const rAF = requestAnimationFrame(() => {
       const containerRect = container.getBoundingClientRect();
       const selectedRect = selectedEl.getBoundingClientRect();
@@ -102,7 +121,7 @@ const Calendar = () => {
       container.scrollTo({ left: next, behavior: "smooth" });
     });
     return () => cancelAnimationFrame(rAF);
-  }, [selected, cursor, days.length]);
+  }, [selected, days.length]);
 
   return (
     <div className={styles.wrap}>
@@ -113,13 +132,9 @@ const Calendar = () => {
             className={styles.navGrow}
             onClick={() => {
               const d = new Date(selected.getTime() - 24 * 3600 * 1000);
+              shouldScrollRef.current = true;
               setCursor(d);
               setSelected(d);
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  scrollSelectedDayIntoCenter();
-                });
-              });
             }}
           >
             ←
@@ -129,13 +144,9 @@ const Calendar = () => {
             className={styles.navGrow}
             onClick={() => {
               const d = new Date(selected.getTime() + 24 * 3600 * 1000);
+              shouldScrollRef.current = true;
               setCursor(d);
               setSelected(d);
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  scrollSelectedDayIntoCenter();
-                });
-              });
             }}
           >
             →
@@ -144,13 +155,9 @@ const Calendar = () => {
             variant="ghost"
             onClick={() => {
               const now = new Date();
+              shouldScrollRef.current = true;
               setCursor(now);
               setSelected(now);
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  scrollSelectedDayIntoCenter();
-                });
-              });
             }}
           >
             Сегодня
@@ -167,7 +174,7 @@ const Calendar = () => {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={`days-${formatDateKey(cursor)}`}
+          key={`days-${formatDateKey(selected)}`}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}

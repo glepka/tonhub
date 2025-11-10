@@ -52,7 +52,7 @@ const SettingsPanel = () => {
             max="100"
             step="1"
             value={salaryPercent}
-            onChange={(e) => setSalaryPercent(e.target.value)}
+            onChange={async (e) => await setSalaryPercent(e.target.value)}
           />
           <span>%</span>
         </label>

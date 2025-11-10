@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persistToCloud, hydrateFromCloud } from "../utils/storage.js";
+import { api } from "../utils/api.js";
 
 const isValidDate = (iso) => {
   if (!iso) return false;
@@ -29,43 +29,85 @@ const validate = (payload) => {
 export const useServicesStore = create((set, get) => ({
   services: [],
   lastError: null,
+  loading: false,
 
   hydrate: async () => {
-    const data = await hydrateFromCloud("services");
-    if (data) set({ services: data });
+    set({ loading: true, lastError: null });
+    try {
+      const data = await api.getServices();
+      set({ services: data || [], loading: false });
+    } catch (err) {
+      set({ lastError: err.message, loading: false });
+      console.error("Failed to load services:", err);
+    }
   },
 
-  addService: (payload) => {
+  addService: async (payload) => {
     const v = validate(payload || {});
     if (!v.ok) {
       set({ lastError: v.error });
       return { ok: false, error: v.error };
     }
-    const service = { id: crypto.randomUUID(), ...v.normalized };
-    const next = [...get().services, service];
-    set({ services: next, lastError: null });
-    persistToCloud("services", next);
-    return { ok: true, service };
+
+    set({ loading: true, lastError: null });
+    try {
+      const service = await api.createService(v.normalized);
+      set((state) => ({
+        services: [...state.services, service],
+        lastError: null,
+        loading: false,
+      }));
+      return { ok: true, service };
+    } catch (err) {
+      const errorMsg = err.message || "Ошибка при создании услуги";
+      set({ lastError: errorMsg, loading: false });
+      console.error("Failed to create service:", err);
+      return { ok: false, error: errorMsg };
+    }
   },
 
-  updateService: (id, patch) => {
+  updateService: async (id, patch) => {
     const current = get().services.find((s) => s.id === id);
     if (!current) return { ok: false, error: "Услуга не найдена" };
+
     const v = validate({ ...current, ...patch });
     if (!v.ok) {
       set({ lastError: v.error });
       return { ok: false, error: v.error };
     }
-    const next = get().services.map((s) => (s.id === id ? { ...s, ...v.normalized } : s));
-    set({ services: next, lastError: null });
-    persistToCloud("services", next);
-    return { ok: true };
+
+    set({ loading: true, lastError: null });
+    try {
+      const service = await api.updateService(id, v.normalized);
+      set((state) => ({
+        services: state.services.map((s) => (s.id === id ? service : s)),
+        lastError: null,
+        loading: false,
+      }));
+      return { ok: true };
+    } catch (err) {
+      const errorMsg = err.message || "Ошибка при обновлении услуги";
+      set({ lastError: errorMsg, loading: false });
+      console.error("Failed to update service:", err);
+      return { ok: false, error: errorMsg };
+    }
   },
 
-  removeService: (id) => {
-    const next = get().services.filter((s) => s.id !== id);
-    set({ services: next });
-    persistToCloud("services", next);
+  removeService: async (id) => {
+    set({ loading: true, lastError: null });
+    try {
+      await api.deleteService(id);
+      set((state) => ({
+        services: state.services.filter((s) => s.id !== id),
+        loading: false,
+      }));
+      return { ok: true };
+    } catch (err) {
+      const errorMsg = err.message || "Ошибка при удалении услуги";
+      set({ lastError: errorMsg, loading: false });
+      console.error("Failed to delete service:", err);
+      return { ok: false, error: errorMsg };
+    }
   },
 }));
 

@@ -47,7 +47,7 @@ const ServiceForm = ({ onCreated }) => {
   }, []);
 
   const onSubmit = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault();
       if (!canSubmit) return;
       const payload = {
@@ -57,7 +57,7 @@ const ServiceForm = ({ onCreated }) => {
         dateISO: form.dateISO,
         workerIds: form.workerIds,
       };
-      const res = addService(payload);
+      const res = await addService(payload);
       if (!res?.ok) {
         setLocalError(res?.error || "Ошибка сохранения");
         return;

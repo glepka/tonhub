@@ -11,7 +11,7 @@ import { useBoxesStore } from "../../store/useBoxesStore.js";
 import { useSettingsStore } from "../../store/useSettingsStore.js";
 
 const Bookings = () => {
-  const { bookings, addBooking, updateBooking, removeBooking } = useBookingsStore();
+  const { bookings, addBooking, updateBooking, removeBooking, hydrate } = useBookingsStore();
   const workers = useWorkersStore((s) => s.workers);
   const boxes = useBoxesStore((s) => s.boxes);
   const defaultSalaryPercent = useSettingsStore((s) => s.salaryPercent);
@@ -23,13 +23,17 @@ const Bookings = () => {
   const [selectedDateTime, setSelectedDateTime] = useState(null);
 
   useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
+  useEffect(() => {
     if (open) {
       setSelectedWorkers(editing?.workers || []);
       setSelectedDateTime(editing?.datetime ? new Date(editing.datetime) : new Date());
     }
   }, [open, editing]);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDateTime) {
       return;
@@ -47,14 +51,14 @@ const Bookings = () => {
       salaryPercent: form.get("salaryPercent") ? Number(form.get("salaryPercent")) : null,
     };
     if (editing) {
-      const res = updateBooking(editing.id, payload);
+      const res = await updateBooking(editing.id, payload);
       if (res && res.ok === false) {
         setConflict(res.conflict);
         setConflictOpen(true);
         return;
       }
     } else {
-      const res = addBooking(payload);
+      const res = await addBooking(payload);
       if (res && res.ok === false) {
         setConflict(res.conflict);
         setConflictOpen(true);
