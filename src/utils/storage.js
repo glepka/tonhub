@@ -1,4 +1,4 @@
-const cloud = () => window?.Telegram?.WebApp?.cloudStorage;
+import { getSupabase } from "./supabase.js";
 
 const local = {
   setItem: (k, v, cb) => {
@@ -20,23 +20,74 @@ const local = {
 
 export const persistToCloud = (key, data) => {
   const str = JSON.stringify(data);
-  const api = cloud() || local;
+  const supa = getSupabase();
+  if (supa) {
+    return supa
+      .from("app_data")
+      .upsert({ key, value: data, updated_at: new Date().toISOString() })
+      .then(({ error }) => {
+        if (!error) return true;
+        try {
+          localStorage.setItem(key, str);
+          return true;
+        } catch {
+          return false;
+        }
+      })
+      .catch(() => {
+        try {
+          localStorage.setItem(key, str);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+  }
   return new Promise((resolve) => {
-    api.setItem(key, str, (ok) => resolve(!!ok));
+    try {
+      localStorage.setItem(key, str);
+      resolve(true);
+    } catch {
+      resolve(false);
+    }
   });
 };
 
 export const hydrateFromCloud = (key) => {
-  const api = cloud() || local;
+  const supa = getSupabase();
+  if (supa) {
+    return supa
+      .from("app_data")
+      .select("value")
+      .eq("key", key)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data && typeof data.value !== "undefined") {
+          return data.value;
+        }
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      })
+      .catch(() => {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      });
+  }
   return new Promise((resolve) => {
-    api.getItem(key, (ok, value) => {
-      if (!ok || !value) return resolve(null);
-      try {
-        resolve(JSON.parse(value));
-      } catch {
-        resolve(null);
-      }
-    });
+    try {
+      const raw = localStorage.getItem(key);
+      resolve(raw ? JSON.parse(raw) : null);
+    } catch {
+      resolve(null);
+    }
   });
 };
 
